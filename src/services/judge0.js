@@ -18,6 +18,12 @@ function fromBase64(str) {
   return Buffer.from(str, "base64").toString("utf-8");
 }
 
+// Ignores incidental whitespace differences (e.g. "[0, 1]" vs "[0,1]")
+// so seed answers don't have to match a solution's exact print formatting.
+function normalizeForComparison(str) {
+  return str.replace(/\s+/g, "");
+}
+
 // Submits one source file against N test cases as a single batch request,
 // then polls until every submission has finished judging.
 async function runBatch({ sourceCode, languageId, testCases }) {
@@ -63,7 +69,9 @@ async function runBatch({ sourceCode, languageId, testCases }) {
     const actualOutput = fromBase64(r.stdout).trim();
     const expectedOutput = testCases[i].expectedOutput.trim();
     const statusDescription = r.status?.description ?? "Unknown";
-    const passed = r.status_id === 3 && actualOutput === expectedOutput; // 3 = Accepted
+    const passed =
+      r.status_id === 3 && // 3 = Accepted
+      normalizeForComparison(actualOutput) === normalizeForComparison(expectedOutput);
 
     return {
       input: testCases[i].input,
