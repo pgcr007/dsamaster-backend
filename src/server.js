@@ -4,6 +4,7 @@ const cors = require("cors");
 const { requireAuth } = require("./middleware/auth");
 const executeRouter = require("./routes/execute");
 const reviewRouter = require("./routes/review");
+const interviewRouter = require("./routes/interview");
 
 const app = express();
 app.use(cors());
@@ -15,6 +16,7 @@ app.get("/health", (req, res) => {
 
 app.use("/execute", requireAuth, executeRouter);
 app.use("/review", requireAuth, reviewRouter);
+app.use("/interview", requireAuth, interviewRouter);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
