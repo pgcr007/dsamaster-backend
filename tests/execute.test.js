@@ -5,6 +5,7 @@ jest.mock("../src/services/judge0", () => ({
 const request = require("supertest");
 const app = require("../src/app");
 const { runBatch } = require("../src/services/judge0");
+const { authHeader } = require("./helpers/authToken");
 
 describe("POST /execute", () => {
   afterEach(() => {
@@ -14,7 +15,7 @@ describe("POST /execute", () => {
   it("returns 400 when required fields are missing", async () => {
     const res = await request(app)
       .post("/execute")
-      .set("Authorization", `Bearer ${process.env.AUTH_TOKEN}`)
+      .set("Authorization", authHeader())
       .send({ sourceCode: "print(1)" });
 
     expect(res.status).toBe(400);
@@ -28,7 +29,7 @@ describe("POST /execute", () => {
 
     const res = await request(app)
       .post("/execute")
-      .set("Authorization", `Bearer ${process.env.AUTH_TOKEN}`)
+      .set("Authorization", authHeader())
       .send({
         sourceCode: "print(1+2)",
         language: "python",
@@ -45,7 +46,7 @@ describe("POST /execute", () => {
 
     const res = await request(app)
       .post("/execute")
-      .set("Authorization", `Bearer ${process.env.AUTH_TOKEN}`)
+      .set("Authorization", authHeader())
       .send({
         sourceCode: "print(1)",
         language: "python",

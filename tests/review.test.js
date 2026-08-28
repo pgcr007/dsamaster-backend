@@ -9,6 +9,7 @@ jest.mock("../src/services/groq", () => ({
 const request = require("supertest");
 const app = require("../src/app");
 const { getReview, getHint } = require("../src/services/groq");
+const { authHeader } = require("./helpers/authToken");
 
 describe("POST /review", () => {
   afterEach(() => {
@@ -18,7 +19,7 @@ describe("POST /review", () => {
   it("returns 400 when required fields are missing", async () => {
     const res = await request(app)
       .post("/review")
-      .set("Authorization", `Bearer ${process.env.AUTH_TOKEN}`)
+      .set("Authorization", authHeader())
       .send({ language: "python" });
 
     expect(res.status).toBe(400);
@@ -35,7 +36,7 @@ describe("POST /review", () => {
 
     const res = await request(app)
       .post("/review")
-      .set("Authorization", `Bearer ${process.env.AUTH_TOKEN}`)
+      .set("Authorization", authHeader())
       .send({
         code: "def solve(): pass",
         language: "python",
@@ -52,7 +53,7 @@ describe("POST /review", () => {
 
     const res = await request(app)
       .post("/review")
-      .set("Authorization", `Bearer ${process.env.AUTH_TOKEN}`)
+      .set("Authorization", authHeader())
       .send({
         mode: "hint",
         code: "",
@@ -72,7 +73,7 @@ describe("POST /review", () => {
 
     const res = await request(app)
       .post("/review")
-      .set("Authorization", `Bearer ${process.env.AUTH_TOKEN}`)
+      .set("Authorization", authHeader())
       .send({ mode: "hint", code: "", language: "python", problemTitle: "Two Sum" });
 
     expect(res.status).toBe(200);

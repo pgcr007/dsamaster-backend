@@ -8,6 +8,7 @@ jest.mock("../src/services/groq", () => ({
 
 const request = require("supertest");
 const app = require("../src/app");
+const { authHeader } = require("./helpers/authToken");
 const {
   getClarifyingQuestion,
   getFollowUpQuestion,
@@ -22,7 +23,7 @@ describe("POST /interview", () => {
   it("returns 400 for an unknown mode", async () => {
     const res = await request(app)
       .post("/interview")
-      .set("Authorization", `Bearer ${process.env.AUTH_TOKEN}`)
+      .set("Authorization", authHeader())
       .send({ mode: "banana" });
 
     expect(res.status).toBe(400);
@@ -31,7 +32,7 @@ describe("POST /interview", () => {
   it("clarify mode requires problemTitle and approach", async () => {
     const res = await request(app)
       .post("/interview")
-      .set("Authorization", `Bearer ${process.env.AUTH_TOKEN}`)
+      .set("Authorization", authHeader())
       .send({ mode: "clarify", problemTitle: "Two Sum" });
 
     expect(res.status).toBe(400);
@@ -46,7 +47,7 @@ describe("POST /interview", () => {
 
     const res = await request(app)
       .post("/interview")
-      .set("Authorization", `Bearer ${process.env.AUTH_TOKEN}`)
+      .set("Authorization", authHeader())
       .send({ mode: "clarify", problemTitle: "Two Sum", approach: "Use a hash map" });
 
     expect(res.status).toBe(200);
@@ -59,7 +60,7 @@ describe("POST /interview", () => {
 
     const res = await request(app)
       .post("/interview")
-      .set("Authorization", `Bearer ${process.env.AUTH_TOKEN}`)
+      .set("Authorization", authHeader())
       .send({
         mode: "followup",
         problemTitle: "Two Sum",
@@ -80,7 +81,7 @@ describe("POST /interview", () => {
 
     const res = await request(app)
       .post("/interview")
-      .set("Authorization", `Bearer ${process.env.AUTH_TOKEN}`)
+      .set("Authorization", authHeader())
       .send({
         mode: "summary",
         problemTitle: "Two Sum",
