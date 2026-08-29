@@ -1,4 +1,5 @@
 const express = require("express");
+const { OAuth2Client } = require("google-auth-library");
 const User = require("../models/User");
 const { hashPassword, comparePassword } = require("../utils/password");
 const { signToken } = require("../utils/jwt");
@@ -6,6 +7,7 @@ const { signToken } = require("../utils/jwt");
 const router = express.Router();
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const googleClient = new OAuth2Client(process.env.GOOGLE_WEB_CLIENT_ID);
 
 function toPublicUser(user) {
   return {
@@ -74,6 +76,52 @@ router.post("/login", async (req, res) => {
   } catch (err) {
     console.error("Login error:", err.message);
     res.status(500).json({ error: "Login failed" });
+  }
+});
+
+router.post("/google", async (req, res) => {
+  const { idToken } = req.body;
+
+  if (!idToken) {
+    return res.status(400).json({ error: "idToken is required" });
+  }
+
+  try {
+    const ticket = await googleClient.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_WEB_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+
+    if (!payload || !payload.email) {
+      return res.status(401).json({ error: "Invalid Google token" });
+    }
+
+    const email = payload.email.toLowerCase().trim();
+    const googleId = payload.sub;
+    const name = payload.name || "";
+
+    let user = await User.findOne({ $or: [{ googleId }, { email }] });
+
+    if (!user) {
+      user = await User.create({
+        email,
+        name,
+        googleId,
+        authProvider: "google",
+      });
+    } else if (!user.googleId) {
+      // An account with this email already exists (e.g. registered with a
+      // password) — link the Google identity onto it instead of duplicating.
+      user.googleId = googleId;
+      await user.save();
+    }
+
+    const token = signToken(user._id.toString());
+    res.json({ token, user: toPublicUser(user) });
+  } catch (err) {
+    console.error("Google auth error:", err.message);
+    res.status(401).json({ error: "Google sign-in failed" });
   }
 });
 

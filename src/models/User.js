@@ -10,12 +10,36 @@ const userSchema = new mongoose.Schema({
   },
   passwordHash: {
     type: String,
-    required: true,
+    // Only required for accounts created with email + password.
+    // Social-only accounts (Google/Facebook/LinkedIn) skip this.
+    required: function () {
+      return !this.googleId && !this.facebookId && !this.linkedinId;
+    },
   },
   name: {
     type: String,
     trim: true,
     default: "",
+  },
+  authProvider: {
+    type: String,
+    enum: ["local", "google", "facebook", "linkedin"],
+    default: "local",
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
+  facebookId: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
+  linkedinId: {
+    type: String,
+    unique: true,
+    sparse: true,
   },
   createdAt: {
     type: Date,
