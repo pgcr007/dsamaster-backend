@@ -5,6 +5,7 @@ const authRouter = require("./routes/auth");
 const executeRouter = require("./routes/execute");
 const reviewRouter = require("./routes/review");
 const interviewRouter = require("./routes/interview");
+const profileRouter = require("./routes/profile");
 
 const app = express();
 app.use(cors());
@@ -18,5 +19,6 @@ app.use("/auth", authRouter);
 app.use("/execute", requireAuth, executeRouter);
 app.use("/review", requireAuth, reviewRouter);
 app.use("/interview", requireAuth, interviewRouter);
+app.use("/profile", requireAuth, profileRouter);
 
 module.exports = app;

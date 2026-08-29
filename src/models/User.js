@@ -41,6 +41,50 @@ const userSchema = new mongoose.Schema({
     unique: true,
     sparse: true,
   },
+
+  // --- Profile fields ---
+  bio: {
+    type: String,
+    trim: true,
+    default: "",
+    maxlength: 200,
+  },
+  targetRole: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  targetCompanies: {
+    type: [String],
+    default: [],
+  },
+  experienceLevel: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+  preferredLanguage: {
+    type: String,
+    enum: ["python", "java", "cpp"],
+    default: "python",
+  },
+  githubHandle: {
+    type: String,
+    trim: true,
+    default: "",
+    maxlength: 40,
+  },
+  linkedinUrl: {
+    type: String,
+    trim: true,
+    default: "",
+    maxlength: 200,
+  },
+  interviewTargetDate: {
+    type: Date,
+    default: null,
+  },
+
   createdAt: {
     type: Date,
     default: Date.now,
