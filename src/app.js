@@ -6,6 +6,7 @@ const executeRouter = require("./routes/execute");
 const reviewRouter = require("./routes/review");
 const interviewRouter = require("./routes/interview");
 const profileRouter = require("./routes/profile");
+const syncRouter = require("./routes/sync");
 
 const app = express();
 app.use(cors());
@@ -20,5 +21,6 @@ app.use("/execute", requireAuth, executeRouter);
 app.use("/review", requireAuth, reviewRouter);
 app.use("/interview", requireAuth, interviewRouter);
 app.use("/profile", requireAuth, profileRouter);
+app.use("/sync", requireAuth, syncRouter);
 
 module.exports = app;
